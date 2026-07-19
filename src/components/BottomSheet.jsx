@@ -1,148 +1,134 @@
-function BottomSheet({
-pickup,
-destination,
-setPickup,
-setDestination,
-searchRoute,
-}) {
+import { useNavigate } from "react-router-dom";
+import { useRide } from "../context/RideContext";
+
+function BottomSheet({ pickup, destination }) {
+const navigate = useNavigate();
+
+const {
+distance,
+duration,
+} = useRide();
+
+const tripReady =
+pickup &&
+destination &&
+distance &&
+duration;
+
 return (
 <div
 style={{
 position: "absolute",
-bottom: 0,
 left: 0,
 right: 0,
+bottom: 0,
 background: "#fff",
-borderTopLeftRadius: 32,
-borderTopRightRadius: 32,
+borderTopLeftRadius: 24,
+borderTopRightRadius: 24,
 padding: 20,
-zIndex: 100,
-boxShadow: "0 -10px 30px rgba(0,0,0,.18)",
+boxShadow: "0 -8px 25px rgba(0,0,0,.12)",
+zIndex: 1000,
 }}
 >
-{/* Handle */}
 <div
 style={{
-width: 55,
-height: 6,
-background: "#D8D8D8",
-borderRadius: 50,
-margin: "0 auto 18px",
+width: 50,
+height: 5,
+borderRadius: 10,
+background: "#ddd",
+margin: "0 auto 20px",
 }}
 />
 
-{/* Logo */}
+{!tripReady ? (
+<>
 <h2
 style={{
-textAlign: "center",
 margin: 0,
-fontSize: 30,
-fontWeight: 700,
+marginBottom: 20,
 }}
 >
-<span style={{ color: "#111" }}>Open</span>
-<span style={{ color: "#FFD400" }}>SkyRide</span>
+Where are you going?
 </h2>
 
-<p
+<input
+readOnly
+value={pickup}
+placeholder="Pickup location"
+onClick={() =>
+navigate("/search?type=pickup")
+}
 style={{
-textAlign: "center",
-color: "#777",
-marginTop: 6,
-marginBottom: 24,
+width: "100%",
+padding: 16,
+marginBottom: 12,
+borderRadius: 12,
+border: "1px solid #ddd",
+cursor: "pointer",
+boxSizing: "border-box",
+}}
+/>
+
+<input
+readOnly
+value={destination}
+placeholder="Where to?"
+onClick={() =>
+navigate("/search?type=destination")
+}
+style={{
+width: "100%",
+padding: 16,
+borderRadius: 12,
+border: "1px solid #ddd",
+cursor: "pointer",
+boxSizing: "border-box",
+}}
+/>
+</>
+) : (
+<>
+<h2
+style={{
+marginTop: 0,
 }}
 >
-Request a ride
+Trip Summary
+</h2>
+
+<p>
+📍 <strong>Distance:</strong> {distance}
 </p>
 
-{/* Search Card */}
-<div
-style={{
-background: "#F5F5F5",
-borderRadius: 18,
-padding: 16,
-marginBottom: 20,
-}}
->
-<input
-value={pickup}
-onChange={(e) => setPickup(e.target.value)}
-placeholder="📍 Enter pickup location"
-style={{
-width: "100%",
-padding: 15,
-borderRadius: 12,
-border: "1px solid #E5E5E5",
-marginBottom: 12,
-fontSize: 16,
-boxSizing: "border-box",
-outline: "none",
-}}
-/>
-
-<input
-value={destination}
-onChange={(e) => setDestination(e.target.value)}
-placeholder="🏁 Where are you going?"
-style={{
-width: "100%",
-padding: 15,
-borderRadius: 12,
-border: "1px solid #E5E5E5",
-fontSize: 16,
-boxSizing: "border-box",
-outline: "none",
-}}
-/>
-</div>
-
-{/* Quick Destinations */}
-<div
-style={{
-display: "flex",
-gap: 10,
-marginBottom: 20,
-overflowX: "auto",
-}}
->
-{["🏠 Home", "💼 Work", "⭐ Favorites"].map((item) => (
-<div
-key={item}
-style={{
-background: "#F5F5F5",
-padding: "10px 16px",
-borderRadius: 30,
-whiteSpace: "nowrap",
-fontWeight: 600,
-fontSize: 14,
-}}
->
-{item}
-</div>
-))}
-</div>
+<p>
+⏱ <strong>Duration:</strong> {duration}
+</p>
 
 <button
-onClick={searchRoute}
 style={{
 width: "100%",
 padding: 16,
-borderRadius: 16,
+borderRadius: 12,
 border: "none",
-background: "#FFD400",
-color: "#111",
+background: "#000",
+color: "#fff",
 fontSize: 18,
-fontWeight: 700,
+fontWeight: 600,
 cursor: "pointer",
+marginTop: 15,
 }}
 >
-Find Ride
+Choose Ride
 </button>
+</>
+)}
 </div>
 );
 }
 
 export default BottomSheet;
+
+
 
 
 

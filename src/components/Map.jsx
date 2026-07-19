@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
 GoogleMap,
 DirectionsRenderer,
@@ -23,6 +24,21 @@ gestureHandling: "greedy",
 };
 
 function Map({ center, directions }) {
+const [map, setMap] = useState(null);
+
+useEffect(() => {
+if (!map || !directions) return;
+
+const bounds = new window.google.maps.LatLngBounds();
+
+directions.routes[0].legs.forEach((leg) => {
+bounds.extend(leg.start_location);
+bounds.extend(leg.end_location);
+});
+
+map.fitBounds(bounds);
+}, [map, directions]);
+
 return (
 <div
 style={{
@@ -36,6 +52,7 @@ mapContainerStyle={containerStyle}
 center={center}
 zoom={15}
 options={mapOptions}
+onLoad={(mapInstance) => setMap(mapInstance)}
 >
 {directions && (
 <DirectionsRenderer
@@ -52,7 +69,8 @@ strokeOpacity: 0.9,
 )}
 </GoogleMap>
 
-{/* OpenSkyRide SVG Marker */}
+{/* OpenSkyRide Marker */}
+{!directions && (
 <div
 style={{
 position: "absolute",
@@ -65,15 +83,14 @@ pointerEvents: "none",
 >
 <img
 src={marker}
-alt="OpenSkyRide Marker"
+alt="Marker"
 style={{
 width: 52,
 height: 68,
-userSelect: "none",
-WebkitUserDrag: "none",
 }}
 />
 </div>
+)}
 
 {/* My Location Button */}
 <button
@@ -89,17 +106,12 @@ background: "#FFFFFF",
 boxShadow: "0 6px 18px rgba(0,0,0,.25)",
 fontSize: 22,
 cursor: "pointer",
-display: "flex",
-alignItems: "center",
-justifyContent: "center",
 }}
 >
-📡
+📍
 </button>
 </div>
 );
 }
 
 export default Map;
-
-

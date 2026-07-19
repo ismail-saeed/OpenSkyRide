@@ -1,53 +1,84 @@
-import { useState } from "react";
-import { LoadScript } from "@react-google-maps/api";
+
+import { useEffect } from "react";
+import { useJsApiLoader } from "@react-google-maps/api";
 
 import Map from "../components/Map";
 import BottomSheet from "../components/BottomSheet";
 import TopBar from "../components/TopBar";
 
+import { useRide } from "../context/RideContext";
+
 const libraries = ["places"];
 
 function Home() {
-const [pickup, setPickup] = useState("");
-const [destination, setDestination] = useState("");
-const [directions, setDirections] = useState(null);
+const {
+pickup,
+destination,
+
+directions,
+setDirections,
+
+setDistance,
+setDuration,
+} = useRide();
 
 const center = {
 lat: 32.817,
 lng: -97.170,
 };
 
-const searchRoute = () => {
+const { isLoaded, loadError } = useJsApiLoader({
+id: "google-map-script",
+googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+libraries,
+});
+
+useEffect(() => {
+if (!isLoaded) return;
 if (!pickup || !destination) return;
 
-const service = new google.maps.DirectionsService();
+const service = new window.google.maps.DirectionsService();
 
 service.route(
 {
 origin: pickup,
 destination: destination,
-travelMode: google.maps.TravelMode.DRIVING,
+travelMode: window.google.maps.TravelMode.DRIVING,
 },
 (result, status) => {
 if (status === "OK") {
 setDirections(result);
-} else {
-alert("Unable to calculate route.");
+
+const leg = result.routes[0].legs[0];
+
+setDistance(leg.distance.text);
+setDuration(leg.duration.text);
 }
 }
 );
-};
+}, [
+isLoaded,
+pickup,
+destination,
+setDirections,
+setDistance,
+setDuration,
+]);
+
+if (loadError) {
+return <h2>Failed to load Google Maps.</h2>;
+}
+
+if (!isLoaded) {
+return <h2>Loading Maps...</h2>;
+}
 
 return (
-<LoadScript
-googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-libraries={libraries}
->
 <div
 style={{
-position: "relative",
 width: "100%",
 height: "100vh",
+position: "relative",
 overflow: "hidden",
 }}
 >
@@ -61,12 +92,8 @@ directions={directions}
 <BottomSheet
 pickup={pickup}
 destination={destination}
-setPickup={setPickup}
-setDestination={setDestination}
-searchRoute={searchRoute}
 />
 </div>
-</LoadScript>
 );
 }
 
