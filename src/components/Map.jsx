@@ -29,14 +29,21 @@ const [map, setMap] = useState(null);
 useEffect(() => {
 if (!map || !directions) return;
 
-const bounds = new window.google.maps.LatLngBounds();
+// استخدم الـ Bounds التي ترجعها Google مباشرة
+map.fitBounds(directions.routes[0].bounds);
 
-directions.routes[0].legs.forEach((leg) => {
-bounds.extend(leg.start_location);
-bounds.extend(leg.end_location);
-});
+// ابتعد درجة واحدة حتى يظهر الطريق بالكامل
+window.google.maps.event.addListenerOnce(
+map,
+"bounds_changed",
+() => {
+const zoom = map.getZoom();
 
-map.fitBounds(bounds);
+if (zoom > 0) {
+map.setZoom(zoom - 1);
+}
+}
+);
 }, [map, directions]);
 
 return (
@@ -69,7 +76,6 @@ strokeOpacity: 0.9,
 )}
 </GoogleMap>
 
-{/* OpenSkyRide Marker */}
 {!directions && (
 <div
 style={{
@@ -92,7 +98,6 @@ height: 68,
 </div>
 )}
 
-{/* My Location Button */}
 <button
 style={{
 position: "absolute",
