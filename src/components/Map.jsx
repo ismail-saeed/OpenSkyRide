@@ -6,6 +6,7 @@ DirectionsRenderer,
 
 import mapStyle from "../styles/mapStyle";
 import marker from "../assets/opensky-marker.svg";
+import { useRide } from "../context/RideContext";
 
 const containerStyle = {
 width: "100%",
@@ -26,25 +27,65 @@ gestureHandling: "greedy",
 function Map({ center, directions }) {
 const [map, setMap] = useState(null);
 
+const {
+setPickup,
+setPickupPlace,
+} = useRide();
+
 useEffect(() => {
 if (!map || !directions) return;
 
-// استخدم الـ Bounds التي ترجعها Google مباشرة
 map.fitBounds(directions.routes[0].bounds);
 
-// ابتعد درجة واحدة حتى يظهر الطريق بالكامل
 window.google.maps.event.addListenerOnce(
 map,
-"bounds_changed",
+"idle",
 () => {
 const zoom = map.getZoom();
 
-if (zoom > 0) {
-map.setZoom(zoom - 1);
+if (zoom > 15) {
+map.setZoom(15);
 }
 }
 );
 }, [map, directions]);
+
+const goToMyLocation = () => {
+if (!navigator.geolocation) return;
+
+navigator.geolocation.getCurrentPosition(
+(position) => {
+const location = {
+lat: position.coords.latitude,
+lng: position.coords.longitude,
+};
+
+map?.panTo(location);
+map?.setZoom(16);
+
+const geocoder = new window.google.maps.Geocoder();
+
+geocoder.geocode(
+{
+location,
+},
+(results, status) => {
+if (
+status === "OK" &&
+results &&
+results.length > 0
+) {
+setPickup(results[0].formatted_address);
+setPickupPlace(location);
+}
+}
+);
+},
+(error) => {
+console.log(error);
+}
+);
+};
 
 return (
 <div
@@ -66,6 +107,7 @@ onLoad={(mapInstance) => setMap(mapInstance)}
 directions={directions}
 options={{
 suppressMarkers: true,
+preserveViewport: false,
 polylineOptions: {
 strokeColor: "#FFD400",
 strokeWeight: 6,
@@ -99,6 +141,7 @@ height: 68,
 )}
 
 <button
+onClick={goToMyLocation}
 style={{
 position: "absolute",
 right: 20,
@@ -111,6 +154,10 @@ background: "#FFFFFF",
 boxShadow: "0 6px 18px rgba(0,0,0,.25)",
 fontSize: 22,
 cursor: "pointer",
+display: "flex",
+alignItems: "center",
+justifyContent: "center",
+zIndex: 1000,
 }}
 >
 📍

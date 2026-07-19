@@ -4,16 +4,17 @@ import { useRide } from "../context/RideContext";
 function BottomSheet({ pickup, destination }) {
 const navigate = useNavigate();
 
-const {
-distance,
-duration,
-} = useRide();
+const { distance, duration } = useRide();
 
 const tripReady =
 pickup &&
 destination &&
 distance &&
 duration;
+
+const handleChooseRide = () => {
+navigate("/ride-options");
+};
 
 return (
 <div
@@ -55,9 +56,7 @@ Where are you going?
 readOnly
 value={pickup}
 placeholder="Pickup location"
-onClick={() =>
-navigate("/search?type=pickup")
-}
+onClick={() => navigate("/search?type=pickup")}
 style={{
 width: "100%",
 padding: 16,
@@ -73,9 +72,7 @@ boxSizing: "border-box",
 readOnly
 value={destination}
 placeholder="Where to?"
-onClick={() =>
-navigate("/search?type=destination")
-}
+onClick={() => navigate("/search?type=destination")}
 style={{
 width: "100%",
 padding: 16,
@@ -105,6 +102,7 @@ Trip Summary
 </p>
 
 <button
+onClick={handleChooseRide}
 style={{
 width: "100%",
 padding: 16,
@@ -127,7 +125,6 @@ Choose Ride
 }
 
 export default BottomSheet;
-
 
 
 
