@@ -14,6 +14,8 @@ pickup,
 destination,
 setPickup,
 setDestination,
+setPickupPlace,
+setDestinationPlace,
 } = useRide();
 
 const [autocomplete, setAutocomplete] = useState(null);
@@ -34,12 +36,25 @@ if (!autocomplete) return;
 
 const place = autocomplete.getPlace();
 
-if (!place?.formatted_address) return;
+if (
+!place ||
+!place.formatted_address ||
+!place.geometry
+) {
+return;
+}
+
+const location = {
+lat: place.geometry.location.lat(),
+lng: place.geometry.location.lng(),
+};
 
 if (type === "pickup") {
 setPickup(place.formatted_address);
+setPickupPlace(location);
 } else {
 setDestination(place.formatted_address);
+setDestinationPlace(location);
 }
 
 navigate("/");
@@ -53,7 +68,6 @@ background: "#f8f8f8",
 }}
 >
 {/* Header */}
-
 <div
 style={{
 background: "#000",
@@ -96,7 +110,6 @@ OpenSkyRide
 </div>
 
 {/* Search Box */}
-
 <div
 style={{
 padding: 20,
@@ -133,6 +146,7 @@ boxShadow: "0 4px 12px rgba(0,0,0,.08)",
 />
 </Autocomplete>
 
+{/* Quick Access */}
 <div
 style={{
 marginTop: 30,
@@ -142,11 +156,7 @@ padding: 18,
 boxShadow: "0 4px 12px rgba(0,0,0,.08)",
 }}
 >
-<h3
-style={{
-marginTop: 0,
-}}
->
+<h3 style={{ marginTop: 0 }}>
 Quick Access
 </h3>
 

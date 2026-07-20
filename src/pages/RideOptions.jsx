@@ -141,23 +141,15 @@ fontSize: 34,
 </div>
 
 <div>
-<h3
-style={{
-margin: 0,
-}}
->
+<h3 style={{ margin: 0 }}>
 {ride.name}
 </h3>
 
-<small>
-{ride.description}
-</small>
+<small>{ride.description}</small>
 
 <br />
 
-<small>
-{ride.time}
-</small>
+<small>{ride.time}</small>
 </div>
 </div>
 
@@ -167,7 +159,7 @@ margin: 0,
 
 <button
 disabled={!selectedRide}
-onClick={() => alert("Ride confirmed successfully!")}
+onClick={() => navigate("/finding-driver")}
 style={{
 width: "100%",
 padding: 18,

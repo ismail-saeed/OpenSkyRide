@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
 GoogleMap,
 DirectionsRenderer,
+Marker,
 } from "@react-google-maps/api";
 
 import mapStyle from "../styles/mapStyle";
@@ -28,6 +29,8 @@ function Map({ center, directions }) {
 const [map, setMap] = useState(null);
 
 const {
+pickupPlace,
+destinationPlace,
 setPickup,
 setPickupPlace,
 } = useRide();
@@ -102,6 +105,20 @@ zoom={15}
 options={mapOptions}
 onLoad={(mapInstance) => setMap(mapInstance)}
 >
+{pickupPlace && (
+<Marker
+position={pickupPlace}
+label="A"
+/>
+)}
+
+{destinationPlace && (
+<Marker
+position={destinationPlace}
+label="B"
+/>
+)}
+
 {directions && (
 <DirectionsRenderer
 directions={directions}
@@ -118,7 +135,7 @@ strokeOpacity: 0.9,
 )}
 </GoogleMap>
 
-{!directions && (
+{!pickupPlace && (
 <div
 style={{
 position: "absolute",
@@ -167,3 +184,4 @@ zIndex: 1000,
 }
 
 export default Map;
+
